@@ -1,0 +1,53 @@
+<IfModule mod_rewrite.c>
+DirectoryIndex index.php
+RewriteEngine On
+RewriteCond $1 !^(index\.php|(.*)\.images|css|jquery|js|robots\.txt|favicon\.ico)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ ./index.php?$1 [L,QSA]
+</IfModule>
+# BEGIN REQUIRED FOR COMPRESSION OR DEFLATE
+<ifModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/rss+xml
+  AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+  AddOutputFilterByType DEFLATE application/x-font
+  AddOutputFilterByType DEFLATE application/x-font-opentype
+  AddOutputFilterByType DEFLATE application/x-font-otf
+  AddOutputFilterByType DEFLATE application/x-font-truetype
+  AddOutputFilterByType DEFLATE application/x-font-ttf
+  AddOutputFilterByType DEFLATE application/x-javascript
+  AddOutputFilterByType DEFLATE application/xhtml+xml
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE font/opentype
+  AddOutputFilterByType DEFLATE font/otf
+  AddOutputFilterByType DEFLATE font/ttf
+  AddOutputFilterByType DEFLATE image/svg+xml
+  AddOutputFilterByType DEFLATE image/x-icon
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE text/plain
+  AddOutputFilterByType DEFLATE text/xml
+</ifModule>
+# BEGIN REQUIRED FOR WEBFONTS
+AddType font/ttf .ttf
+AddType font/eot .eot
+AddType font/otf .otf
+AddType font/woff .woff
+AddType font/woff2 .woff2
+# Add CORS headers for font assets. Used when served by a CDN
+SetEnvIf Request_Protocol ^HTTPS.* IS_HTTPS
+ SetEnvIf Host (.*) host_header=$1
+<FilesMatch ".(eot|ttf|woff|woff2|otf|svg)">
+  Header set Access-Control-Allow-Origin "https://%{host_header}e" env=IS_HTTPS
+  Header set Access-Control-Allow-Origin "http://%{host_header}e" env=!IS_HTTPS
+</FilesMatch>
+# END REQUIRED FOR WEBFONTS
+<FilesMatch "\.(css|js|jpg|jpeg|png|gif|swf|ttf|woff|woff2|otf|svg)$">
+FileETag None
+<ifModule mod_headers.c>
+  Header set Cache-Control "max-age=220752000, public"
+  Header set Connection keep-alive
+</ifModule>
+</FilesMatch>
